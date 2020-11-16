@@ -1,0 +1,123 @@
+Sub 新建保存关闭()
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+' 新建
+Documents.Add
+
+' 加入文字
+Selection.TypeText "王明鑫"
+
+' 保存的多种方式
+'ActiveDocument.Close savechanges:=wdSaveChanges
+'ActiveDocument.Close savechanges:=wdDoNotSaveChanges
+
+Dim doc As Document
+For Each doc In Documents
+    doc.Close savechanges:=wdPromptToSaveChanges
+Next
+
+' 另存
+ActiveDocument.SaveAs2 "D:\WordVba\wmx.doc"
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+End Sub
+
+
+
+
+
+
+Sub 文档基础属性()
+''MsgBox Documents.Count
+''反斜杠 = Word.Application.PathSeparator
+''目录 = ActiveDocument.Path
+''MsgBox ActiveDocument.Path & "\" & ActiveDocument.Name
+''MsgBox ActiveDocument.Path & 反斜杠 & ActiveDocument.Name
+'Set dc = ActiveDocument
+'MsgBox dc.FullName
+
+Set dc = ActiveDocument
+Set rng = dc.Range(0, 0)
+With rng
+    .InsertBefore "王明鑫插入的标题"
+    .Font.Name = "Arial"
+    .Font.Size = 50
+    .InsertParagraphAfter '在插入之后再插入一个段落，不实用
+End With
+End Sub
+
+Sub printwd()
+' 打印
+' 打印当前页面
+Set dc = ActiveDocument
+dc.PrintOut Range:=wdPrintCurrentPage
+' 打印指定范围
+dc.PrintOut Range:=wdPrintFromTo, From:="1", to:="3"
+dc.PrintOut Range:=wdPrintRangeOfPages, Page:="1,3,5"
+End Sub
+
+Sub 打印当前文件夹下所有docx文件()
+f = Dir(".docx")
+Do While f <> ""
+    PrintOut FileName:=f
+    f = Dir()
+Loop
+End Sub
+
+
+
+
+
+Sub 打印当前文件夹下所有docx文件()
+f = Dir(".docx")
+Do While f <> ""
+    PrintOut FileName:=f
+    f = Dir()
+Loop
+End Sub
+
+Sub 窗口大小()
+Application.WindowState = wdWindowStateNormal
+Application.WindowState = wdWindowStateMaximize
+Application.WindowState = wdWindowStateMinimize
+End Sub
+
+
+Sub 增删粘剪()
+Documents.Add
+If Windows.Count <> 1 Then
+    Windows(1).Selection.Copy   '第一个窗口内容复制
+    Windows(1).Next.Activate ' 下一个窗口激活
+    If Selection.Information(wdWithInTable) = False Then ' 如果插入点不是表格内
+        Selection.GoToNext what:=wdGoToTable '就移动到下一个表格的第一个单元格
+    End If
+    Selection.Paste
+    ActiveDocument.Close saveChanges:=wdDoNotSaveChanges
+End If
+End Sub
+
+
+
+
+Sub 清除格式()
+ActiveDocument.Select
+Selection.ClearFormatting
+End Sub
+
+Sub 粘贴保存()
+Selection.Copy
+Documents.Add
+ActiveDocument.SaveAs2 "D:\WordVba\wmxn.doc"
+Selection.Paste
+ActiveDocument.Close -1 '保存变更简写
+End Sub
+
+Sub 剪切保存()
+If Selection.Type = wdSelectionNormal Then '先判断是不是用户正常选择
+    Selection.Cut
+    Documents.Add.Content.Paste ' content 是文档中所有内容
+    ActiveDocument.Close -1
+End If
+End Sub
